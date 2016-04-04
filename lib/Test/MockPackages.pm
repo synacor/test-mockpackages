@@ -1,109 +1,34 @@
 package Test::MockPackages;
-
-use warnings;
 use strict;
+use warnings;
+use utf8;
 
-=head1 NAME
+our $VERSION = '0.1';
 
-Test::MockPackages - The great new Test::MockPackages!
+use Carp qw(croak);
+use English qw(-no_match_vars);
+use Test::MockPackages::Package();
 
-=head1 VERSION
+sub new {
+    my ($pkg) = @ARG;
 
-Version 0.01
-
-=cut
-
-our $VERSION = '0.01';
-
-=head1 SYNOPSIS
-
-Quick summary of what the module does.
-
-Perhaps a little code snippet.
-
-    use Test::MockPackages;
-
-    my $foo = Test::MockPackages->new();
-    ...
-
-=head1 EXPORT
-
-A list of functions that can be exported.  You can delete this section
-if you don't export anything, such as for a purely object-oriented module.
-
-=head1 FUNCTIONS
-
-=head2 function1
-
-=cut
-
-sub function1 {
+    return bless {
+        '_packages' => {},
+    }, $pkg;
 }
 
-=head2 function2
+sub package {
+    my ($self, $package_name) = @ARG;
 
-=cut
+    if ( !$package_name || ref($package_name) ) {
+        croak('$package_name is required and must be a SCALAR');
+    }
+    
+    if ( my $package = $self->{_packages}{$package_name} ) {
+        return $package;
+    }
 
-sub function2 {
+    return $self->{_packages}{$package_name} = Test::MockPackages::Package->new($package_name);
 }
 
-=head1 AUTHOR
-
-Tom Peters, C<< <tpeters at synacor.com> >>
-
-=head1 BUGS
-
-Please report any bugs or feature requests to C<bug-test-mockpackages at rt.cpan.org>, or through
-the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Test-MockPackages>.  I will be notified, and then you'll
-automatically be notified of progress on your bug as I make changes.
-
-
-
-
-=head1 SUPPORT
-
-You can find documentation for this module with the perldoc command.
-
-    perldoc Test::MockPackages
-
-
-You can also look for information at:
-
-=over 4
-
-=item * RT: CPAN's request tracker
-
-L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Test-MockPackages>
-
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/Test-MockPackages>
-
-=item * CPAN Ratings
-
-L<http://cpanratings.perl.org/d/Test-MockPackages>
-
-=item * Search CPAN
-
-L<http://search.cpan.org/dist/Test-MockPackages/>
-
-=back
-
-
-=head1 ACKNOWLEDGEMENTS
-
-
-=head1 COPYRIGHT & LICENSE
-
-Copyright 2016 Tom Peters.
-
-This program is free software; you can redistribute it and/or modify it
-under the terms of either: the GNU General Public License as published
-by the Free Software Foundation; or the Artistic License.
-
-See http://dev.perl.org/licenses/ for more information.
-
-
-=cut
-
-1;    # End of Test::MockPackages
+1;
