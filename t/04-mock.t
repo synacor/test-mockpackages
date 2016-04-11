@@ -1,4 +1,4 @@
-#!/usr/bin/env perl;
+#!/usr/bin/env perl
 use strict;
 use warnings;
 use 5.012;
@@ -10,6 +10,7 @@ use Test::Tester;
 use Test::Exception;
 use Test::More;
 use Test::MockPackages::Mock();
+use Test::MockPackages::Returns qw(returns_code);
 use FindBin qw($RealBin);
 use lib "$RealBin/lib";
 use TMPTestPackage();
@@ -552,6 +553,36 @@ subtest 'returns' => sub {
             my $coderef = TMPTestPackage::subroutine();
 
             is( $coderef->(), 5, 'correct CODE returned' );
+        };
+
+        subtest 'custom coderef' => sub {
+            my $m = Test::MockPackages::Mock->new( 'TMPTestPackage', 'subroutine' )
+                ->returns( returns_code { my ( $a ) = @ARG; $a + 5 } );
+            my $retval = TMPTestPackage::subroutine( 10 );
+            is( $retval, 15, 'coderef properly executed' );
+        };
+    };
+
+    subtest 'wantarray' => sub {
+        subtest list => sub {
+            my $m =
+                Test::MockPackages::Mock->new( 'TMPTestPackage', 'subroutine' )->returns( qw(one two three) )->called( 2 );
+
+            my @vals = TMPTestPackage::subroutine();
+            is_deeply( \@vals, [ qw(one two three) ], 'correct list returned' );
+
+            my $value = TMPTestPackage::subroutine();
+            is( $value, 3, 'count returned' );
+        };
+
+        subtest 'single value' => sub {
+            my $m = Test::MockPackages::Mock->new( 'TMPTestPackage', 'subroutine' )->returns( qw(one) )->called( 2 );
+
+            my @vals = TMPTestPackage::subroutine();
+            is_deeply( \@vals, [ qw(one) ], 'correct list returned' );
+
+            my $value = TMPTestPackage::subroutine();
+            is( $value, 'one', 'value returned' );
         };
     };
 };

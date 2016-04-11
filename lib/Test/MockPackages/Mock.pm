@@ -16,13 +16,17 @@ Test::MockPackages::Mock - handles mocking of individual methods and subroutines
 
 =head1 DESCRIPTION
 
-Test::MockPackages::Mock will mock an individual subroutine or method on a given package.
+Test::MockPackages::Mock will mock an individual subroutine or method on a given package. You most likely won't initialize new C<Test::MockPackages::Mock> objects directly, instead you
+should have L<Test::MockPackages> create them for you using the C<mock()> method.
+
+In short this package will allow you to verify that a given subroutine/method is: 1) called the correct number of times (see C<called()>, C<never_called()>, and C<is_method>), 2) called with the correct arguments (see C<expects()>), and 3) returns values you define (C<returns()>).
 
 =cut
 
 use Carp qw(croak);
 use Const::Fast qw(const);
 use English qw(-no_match_vars);
+use Exporter qw(import);
 use Lingua::EN::Inflect qw(PL);
 use List::Util qw(max);
 use Scalar::Util qw(looks_like_number weaken);
@@ -72,7 +76,7 @@ sub new {
 
 =head2 called( Int $called ) : Test::MockPackage::Mock
 
-Will ensure that the subroutine/method has been called C<$called> times. This method cannot be used in combination with C<called()>.
+Will ensure that the subroutine/method has been called C<$called> times. This method cannot be used in combination with C<never_called()>.
 
 You can combined this method with C<expects()> and/or C<returns()> to support repeated values. For example:
     $m->expects($arg1, $arg2)
@@ -155,13 +159,29 @@ sub expects {
     return $self->_validate();
 }
 
-=head2 returns( Any @expects ) : Test::MockPackage::Mock
+=head2 returns( Any @returns ) : Test::MockPackage::Mock
 
 This method sets up what the return values should be. If the return values will change with each invocation, you can call this method multiple times. 
-If this method will always return the same values, you can call C<returns()> once, and then pass in an appropriate value to C<called()>>
+If this method will always return the same values, you can call C<returns()> once, and then pass in an appropriate value to C<called()>.
 
 When the C<Test::MockPackages::Mock> object goes out of scope, we'll test to make sure that the subroutine/method was called the correct number of times based on the number
 of times that C<expects()> was called, unless C<called()> is specified.
+
+Values passed in will be returned verbatim. A deep clone is also performed to accidental side effects aren't tested.
+
+C<wantarray> will be used to try and determine if a list or a single value should be returned. If C<@returns> contains a single element and C<wantarray> is false, the value at index 0 will be returned. Otherwise,
+a list will be returned.
+
+If you'd rather have the value of a custom CODE block returned, you can pass in a CodeRef wrapped using a returns_code from the L<Test::MockPackages::Returns> package.
+
+ use Test::MockPackages::Returns qw(returns_code);
+ ...
+ $m->expects( $arg1, $arg2 )
+   ->returns( returns_code {
+       my (@args) = @ARG;
+
+       return join ', ', @args;
+   } );
 
 Return value: Returns itself to support the fluent interface.
 
@@ -170,12 +190,18 @@ Return value: Returns itself to support the fluent interface.
 sub returns {
     my ( $self, @returns ) = @ARG;
 
-    # this should be safe since we are just doing a dclone(). According to the Storable POD, the eval is only dangerous
-    # when the input may contain malicious data (i.e. the frozen binary data).
-    local $Storable::Deparse = 1;
-    local $Storable::Eval    = 1;
+    # dclone will remove the bless on the CodeRef.
+    if ( @returns == 1 && eval { $returns[ 0 ]->isa( 'Test::MockPackages::Returns' ) } ) {
+        push @{ $self->{_returns} }, \@returns;
+    }
+    else {
+        # this should be safe since we are just doing a dclone(). According to the Storable POD, the eval is only dangerous
+        # when the input may contain malicious data (i.e. the frozen binary data).
+        local $Storable::Deparse = 1;    ## no critic (Variables::ProhibitPackageVars)
+        local $Storable::Eval    = 1;    ## no critic (Variables::ProhibitPackageVars)
 
-    push @{ $self->{_returns} }, dclone( \@returns );
+        push @{ $self->{_returns} }, dclone( \@returns );
+    }
 
     return $self->_validate();
 }
@@ -183,6 +209,13 @@ sub returns {
 # ----
 # private methods
 # ----
+
+# _initialize( ) : Bool
+#
+# This is where everythign is setup. We override the subroutine/method being mocked and replace it with a CodeRef
+# that will perform the various expects checking and return values based on how returns were setup.
+#
+# Return value: True
 
 sub _initialize {
     my ( $self ) = @ARG;
@@ -193,13 +226,18 @@ sub _initialize {
     my $mock = sub {
         my ( @got ) = @ARG;
 
+        # _invoke_count keeps track of how many times this subroutine/method was called
         my $invoke_number = ++$self->{_invoke_count};
-        my $i             = $invoke_number - 1;
 
+        # $i is the current invocation
+        my $i = $invoke_number - 1;
+
+        # the first value passed into the method is the object itself. ignore that.
         if ( $self->{_is_method} ) {
             shift @got;
         }
 
+        # setup the expectations
         if ( my $expects = $self->{_expects} ) {
             my $n_expects = scalar( @$expects );
             my $expected;
@@ -208,19 +246,22 @@ sub _initialize {
             }
             elsif ( $i >= $n_expects ) {
                 croak(
-                    sprintf '%s was called %d %s. Only %d %s defined',
-                    $self->{_full_name}, $invoke_number, PL( 'time', $invoke_number ),
-                    $n_expects, PL( 'expectation', $n_expects )
+                    sprintf(
+                        '%s was called %d %s. Only %d %s defined',
+                        $self->{_full_name}, $invoke_number,    PL( 'time', $invoke_number ),
+                        $n_expects,          PL( 'expectation', $n_expects )
+                    )
                 );
             }
             else {
                 $expected = $expects->[ $i ];
             }
 
-            local $Test::Builder::Level = $Test::Builder::Level + 6;
+            local $Test::Builder::Level = $Test::Builder::Level + 6;    ## no critic (Variables::ProhibitPackageVars)
             is_deeply( \@got, $expected, "$self->{_full_name} expects is correct" );
         }
 
+        # setup the return values
         my @returns;
         if ( my $returns = $self->{_returns} ) {
             my $n_returns = scalar @$returns;
@@ -245,18 +286,30 @@ sub _initialize {
             return;
         }
 
+        if ( @returns == 1 && eval { $returns[ 0 ]->isa( 'Test::MockPackages::Returns' ) } ) {
+            return $returns[ 0 ]->( @got );
+        }
+
+        # return the first element if only one return defined and a wantarray is false.
         return !wantarray && scalar( @returns ) == 1 ? $returns[ 0 ] : @returns;
     };
 
-    no strict qw(refs);
-    no warnings qw(redefine);
-    my $full_name = $self->{_full_name};
-    *$full_name = $mock;
-    use strict;
-    use warnings;
+    do {
+        no strict qw(refs);          ## no critic (TestingAndDebugging::ProhibitNoStrict)
+        no warnings qw(redefine);    ## no critic (TestingAndDebugging::ProhibitNoWarnings)
+        my $full_name = $self->{_full_name};
+        *$full_name = $mock;
+    };
 
     return 1;
 }
+
+# _validate( ) Test::MockPackages::Mock, Throws '...'
+#
+# Validates that the mock has been properly configured up to this point. If any errors
+# were detected, raise an exception.
+#
+# Return value: Returns itself to support the fluent interface.
 
 sub _validate {
     my ( $self ) = @ARG;
@@ -287,6 +340,12 @@ sub _validate {
     return $self;
 }
 
+# _expected_invocations( ) : Maybe[Int]
+#
+# Calculates how many times a subroutine/method is expected to be called.
+#
+# Return value: an integer value on the number of times the subroutine/method should be called.
+
 sub _expected_invocations {
     my ( $self ) = @ARG;
 
@@ -300,9 +359,13 @@ sub _expected_invocations {
     return $max >= 1 ? $max : undef;
 }
 
+# DESTROY( )
+#
+# DESTROY is used to the original subroutine/method back into place and perform any final expectation checking.
+
 sub DESTROY {
-    no strict qw(refs);
-    no warnings qw(redefine);
+    no strict qw(refs);          ## no critic (TestingAndDebugging)
+    no warnings qw(redefine);    ## no critic (TestingAndDebugging)
 
     my ( $self ) = @ARG;
 
@@ -310,21 +373,27 @@ sub DESTROY {
 
     my $expected_invocations = $self->_expected_invocations;
     if ( !$self->{_corrupt} && defined $expected_invocations ) {
-        local $Test::Builder::Level = $Test::Builder::Level + 6;
+        local $Test::Builder::Level = $Test::Builder::Level + 6;    ## no critic (Variables::ProhibitPackageVars)
         $CLASS->builder->is_num( $self->{_invoke_count},
             $expected_invocations,
             sprintf( '%s called %d %s', $full_name, $expected_invocations, PL( 'time', $expected_invocations ) ) );
     }
 
+    # if we have an original CodeRef, put it back in place.
     if ( my $original = $self->{_original_coderef} ) {
         *$full_name = $original;
     }
+
+    # otherwise, remove the CodeRef from the symbol table, but make sure the other types are
+    # left intact.
     else {
         my %copy;
         $copy{$ARG} = *$full_name{$ARG} for grep { defined *$full_name{$ARG} } @GLOB_TYPES;
         undef *$full_name;
         *$full_name = $copy{$ARG} for keys %copy;
     }
+
+    return;
 }
 
 1;
