@@ -26,6 +26,7 @@ use English qw(-no_match_vars);
 use Lingua::EN::Inflect qw(PL);
 use List::Util qw(max);
 use Scalar::Util qw(looks_like_number weaken);
+use Storable qw(dclone);
 use Test::More;
 use parent qw(Test::Builder::Module);
 
@@ -168,7 +169,7 @@ Return value: Returns itself to support the fluent interface.
 sub returns {
     my ( $self, @returns ) = @ARG;
 
-    push @{ $self->{_returns} }, \@returns;
+    push @{ $self->{_returns} }, dclone( \@returns );
 
     return $self->_validate();
 }
@@ -223,9 +224,11 @@ sub _initialize {
             }
             elsif ( $i >= $n_returns ) {
                 croak(
-                    sprintf '%s was called %d %s. Only %d %s defined',
-                    $self->{_full_name}, $invoke_number, PL( 'time', $invoke_number ),
-                    $n_returns, PL( 'return', $n_returns )
+                    sprintf(
+                        '%s was called %d %s. Only %d %s defined',
+                        $self->{_full_name}, $invoke_number, PL( 'time', $invoke_number ),
+                        $n_returns,          PL( 'return',   $n_returns )
+                    )
                 );
             }
             else {

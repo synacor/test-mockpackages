@@ -530,6 +530,21 @@ subtest 'returns' => sub {
             );
         };
     };
+
+    subtest 'cloning' => sub {
+        my %hash = ( a => 1, );
+
+        my @array = qw(one);
+
+        my $m = Test::MockPackages::Mock->new( 'TMPTestPackage', 'subroutine' )->returns( \%hash, \@array );
+        my ( $return_hash, $return_array ) = TMPTestPackage::subroutine();
+
+        $hash{b} = 2;
+        push @array, 'two';
+
+        is_deeply( $return_hash, { a => 1 }, 'hash was properly cloned' );
+        is_deeply( $return_array, [ 'one' ], 'array was properly cloned' );
+    };
 };
 
 subtest '_validate' => sub {
