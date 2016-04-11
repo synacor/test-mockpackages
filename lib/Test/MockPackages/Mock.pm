@@ -21,6 +21,34 @@ should have L<Test::MockPackages> create them for you using the C<mock()> method
 
 In short this package will allow you to verify that a given subroutine/method is: 1) called the correct number of times (see C<called()>, C<never_called()>, and C<is_method>), 2) called with the correct arguments (see C<expects()>), and 3) returns values you define (C<returns()>).
 
+=head2 Examples
+
+Here's a trivial example. We have a subroutine, C<calculate()> that uses an external dependency, C<ACME::Widget::do_something()> to help calculate our value.  
+
+ sub calculate {
+     my ( $input ) = @ARG;
+
+     return ACME::Widget::do_something( $input, 'CONSTANT' );
+ }
+
+When we test our C<calculate()> subroutine, we can mock the C<ACME::Widget::do_something()> call:
+
+ subtest 'calculate()' => sub {
+     my $m = Test::MockPackages->new();
+     $m->pkg('ACME::Widget')
+       ->mock('do_something')
+       ->expects( 15, 'CONSTANT' )
+       ->returns( 20 );
+
+    is( calculate( 15 ), 20, 'correct value returned from calculate' );
+ };
+
+The test output will look something like:
+
+ ok 1 - ACME::Widget::do_something expects is correct
+ ok 2 - correct value returned from calculate
+ ok 3 - ACME::Widget::do_something called 1 time
+
 =cut
 
 use Carp qw(croak);
@@ -74,7 +102,7 @@ sub new {
 
 =head1 METHODS
 
-=head2 called( Int $called ) : Test::MockPackage::Mock
+=head2 called( Int $called ) : Test::MockPackage::Mock, Throws '...'
 
 Will ensure that the subroutine/method has been called C<$called> times. This method cannot be used in combination with C<never_called()>.
 
@@ -88,6 +116,9 @@ You can combined this method with C<expects()> and/or C<returns()> to support re
 can be simplified as:
     $m->expects($arg1, $arg2)
       ->called(5);
+
+By default, this package will ensure that a mocked subroutine/method is called the same number of times that C<expects()> and/or C<returns()> has been setup for.
+You only need to use this method if you don't setup any expects or returns, or to simplify repeated values like what was shown up above.
 
 Return value: Returns itself to support the fluent interface.
 
@@ -105,7 +136,7 @@ sub called {
     return $self->_validate();
 }
 
-=head2 never_called() : Test::MockPackage::Mock
+=head2 never_called() : Test::MockPackage::Mock, Throws '...'
 
 Ensures that this subroutine/method will never be called. This method cannot be used in combination with C<called()>, C<expects()>, or C<returns()>.
 
@@ -121,7 +152,7 @@ sub never_called {
     return $self->_validate();
 }
 
-=head2 is_method() : Test::MockPackage::Mock
+=head2 is_method() : Test::MockPackage::Mock, Throws '...'
 
 Specifies that the mocked subroutine is a method. When setting up expectations using C<expects()>, it will ignore the first value which is typically the object.
 
@@ -137,7 +168,7 @@ sub is_method {
     return $self->_validate();
 }
 
-=head2 expects( Any @expects ) : Test::MockPackage::Mock
+=head2 expects( Any @expects ) : Test::MockPackage::Mock, Throws '...'
 
 Ensures that each invocation has the correct arguments passed in. If the subroutine/method will be called multiple times, you can call C<expects()> multiple times. If
 the same expectation will be used repeatedly, you can use this in conjunction with C<called()>. See L<called()> for more information.
@@ -159,7 +190,7 @@ sub expects {
     return $self->_validate();
 }
 
-=head2 returns( Any @returns ) : Test::MockPackage::Mock
+=head2 returns( Any @returns ) : Test::MockPackage::Mock, Throws '...'
 
 This method sets up what the return values should be. If the return values will change with each invocation, you can call this method multiple times. 
 If this method will always return the same values, you can call C<returns()> once, and then pass in an appropriate value to C<called()>.
