@@ -49,6 +49,7 @@ sub new {
     my $original = exists &$full_name ? \&$full_name : undef;
 
     my $self = bless {
+        _allow_eval       => 0,
         _called           => undef,
         _expects          => undef,
         _full_name        => $full_name,
@@ -168,6 +169,11 @@ Return value: Returns itself to support the fluent interface.
 
 sub returns {
     my ( $self, @returns ) = @ARG;
+
+    # this should be safe since we are just doing a dclone(). According to the Storable POD, the eval is only dangerous
+    # when the input may contain malicious data (i.e. the frozen binary data).
+    local $Storable::Deparse = 1;
+    local $Storable::Eval    = 1;
 
     push @{ $self->{_returns} }, dclone( \@returns );
 
