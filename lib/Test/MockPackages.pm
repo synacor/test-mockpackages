@@ -209,6 +209,8 @@ C<$sub_or_method_name> is the name of the subroutine or method that you'd like t
  $m->pkg( $package_name )
    ->mock( $sub_or_method_name )
 
+The value for C<$sub_or_method_name> should be an ArrayRef. This is so we can support having multiple C<expects> and C<returns>.
+
 C<$option> is the name of one of the methods you can call in L<Test::MockPackages::Mock> (e.g. C<called>, C<never_called>, C<is_method>, C<expects>, C<returns>). The value for C<$option> should always be an ArrayRef. This is equivalent to:
 
  $m->pkg( $package_name )
