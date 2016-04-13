@@ -2,10 +2,10 @@
 use strict;
 use warnings;
 
+use Test::Tester;
 use Test::Exception;
 use Test::More;
 use Test::MockPackages qw(mock);
-use Test::Tester;
 
 subtest 'validation' => sub {
     throws_ok(

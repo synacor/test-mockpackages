@@ -102,6 +102,8 @@ sub _must_validate {
 
 __END__
 
+=encoding utf-8
+
 =head1 NAME
 
 Test::MockPackages - Mocking framework
