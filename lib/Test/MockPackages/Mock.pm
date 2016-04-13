@@ -288,7 +288,7 @@ sub _initialize {
                 $expected = $expects->[ $i ];
             }
 
-            local $Test::Builder::Level = $Test::Builder::Level + 6;    ## no critic (Variables::ProhibitPackageVars)
+            local $Test::Builder::Level = $Test::Builder::Level + 1;    ## no critic (Variables::ProhibitPackageVars)
             is_deeply( \@got, $expected, "$self->{_full_name} expects is correct" );
         }
 
