@@ -130,7 +130,7 @@ Test::MockPackages - Mocking framework
    ->expects( $arg3, $arg4, $arg5 )   # expects & returns for call #2
    ->returns( $retval2 );
 
- # using a helper sub.
+ # using the mock() sub.
  my $m = mock({
      'ACME::Widget' => {
          do_thing => [
@@ -152,6 +152,101 @@ Test::MockPackages - Mocking framework
          ...
      },
  });
+
+=head1 DESCRIPTION
+
+Test::MockPackages is a package for mocking other packages as well as ensuring those packages are being used correctly.
+
+Say we have a Weather class that can return the current degrees in Fahrenheit. In order to do this it uses another class, Weather::Fetcher which
+makes an external call. When we want to write a unit test for Weather, we want to mock the functionality of Weather::Fethcer.
+
+Here is the sample code for our Weather class:
+
+ package Weather;
+ use Moose;
+ use Weather::Fetcher;
+ sub degrees_f {
+     my ( $self, $zip_code ) = @_;
+
+     my $data = eval { Weather::Fetcher::fetch_weather( $zip_code ) };
+     if ( !$data ) {
+         return;
+     }
+
+     return $data->{temp_f} . "°F";
+ }
+
+And here's how we may choose to test this class. In the C<success> subtest, we use the mock() helper subroutine, and in the C<failure> method we use the OOP approach. Both provide identical functionality.
+
+ use Test::More;
+ use Test::MockPackages qw(mock);
+ subtest 'degrees_f' => sub {
+     subtest 'success' => sub {
+         my $m = mock({
+             'Weather::Fetcher' => {
+                 fetch_weather => [
+                    expects => [ '14202' ],
+                    returns => [ { temp_f => 80 } ],
+                 ],
+             },
+         });
+
+         isa_ok( my $weather = Weather->new, 'Weather' );
+         is( $weather->degrees_f( 14202 ), '80°F', 'correct temperature returned' );
+     };
+
+     subtest 'failure' => sub {
+         my $m = Test::MockPackages->new();
+         $m->pkg( 'Weather::Fetcher' )
+           ->mock( 'fetch_weather' )
+           ->expects( '14202' )
+           ->returns();
+
+         my $weather = Weather->new;
+         is( $weather->degrees_f( 14202 ), undef, 'no temperature returned' );
+     };
+ };
+ done_testing();
+
+When we run our tests, you can see that Test::MockPackages validates the following for us: 1. the subroutine is called with the correct arguments, 2. the subroutine was called the correct number of times. Lastly, Test::MockPackages allows us to have this mocked subroutine return a consistent value.
+
+         ok 1 - The object isa Weather
+         ok 2 - Weather::Fetcher::fetch_weather expects is correct
+         ok 3 - correct temperature returned
+         ok 4 - Weather::Fetcher::fetch_weather called 1 time
+         1..4
+     ok 1 - success
+         ok 1 - Weather::Fetcher::fetch_weather expects is correct
+         ok 2 - no temperature returned
+         ok 3 - Weather::Fetcher::fetch_weather called 1 time
+         1..3
+     ok 2 - failure
+     1..2
+ ok 1 - degrees_f
+ 1..1
+
+For more information on how to properly configure your mocks, see L<Test::MockPackages::Mock>.
+
+=head2 IMPORTANT NOTE
+
+When the Test::MockPackages object is destroyed, it performs some final verifications. Therefore, it is important that the object is destroyed before done_testing() is called, or before the completion of the script execution. If your tests are contained within a block (e.g. a subtest, do block, etc) you typically don't need to worry about this. If all of your tests are in the top level package or test scope, you may want to undef your object at the end.
+
+Example where we don't have to explicitly destroy our object:
+
+ subtest 'my test' => sub {
+     my $m = mock({ ... });
+
+     # do tests
+ }; # in this example, $m will be destroyed at the end of the subtest and that's OK.
+
+ done_testing();
+
+Example where we would have to explicitly destroy our object:
+
+ my $m = mock({ ... });
+ # do tests
+ undef $m;
+ done_testing();
 
 =head1 CONSTRUCTOR
 
