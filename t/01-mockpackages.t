@@ -3,10 +3,11 @@ use strict;
 use warnings;
 use utf8;
 
+use English qw(-no_match_vars);
 use Test::Tester;
 use Test::Exception;
 use Test::More;
-use Test::MockPackages();
+use Test::MockPackages qw(returns_code);
 
 use FindBin qw($RealBin);
 use lib "$RealBin/lib";
@@ -74,6 +75,15 @@ subtest 'generic test' => sub {
             },
         ]
     );
+};
+
+subtest 'returns_code' => sub {
+    my $coderef = returns_code {
+        return join ', ', @ARG;
+    };
+
+    isa_ok( $coderef, 'Test::MockPackages::Returns' );
+    is( $coderef->( 1, 2, 3 ), '1, 2, 3', 'correct return value' );
 };
 
 done_testing();

@@ -11,8 +11,9 @@ use English qw(-no_match_vars);
 use Exporter qw(import);
 use Test::MockPackages::Mock();
 use Test::MockPackages::Package();
+use Test::MockPackages::Returns qw(returns_code);
 
-our @EXPORT_OK = qw(mock);
+our @EXPORT_OK = qw(mock returns_code);
 
 sub new {
     my ( $pkg ) = @ARG;
@@ -314,11 +315,17 @@ C<$option> is the name of one of the methods you can call in L<Test::MockPackage
    ->mock( $sub_or_method_name )
    ->$option( @{ [ 'arg1', ... ] } );
 
+=head2 returns_code(&)( CodeRef $coderef ) : Test::MockPackages::Returns
+
+Imported from L<Test::MockPackages::Returns>. See that package for more information.
+
 =head1 SEE ALSO
 
 =over 4
 
 =item L<Test::MockPackages::Mock>
+
+=item L<Test::MockPackages::Returns>
 
 =back
 
