@@ -352,7 +352,9 @@ sub _validate {
     my $n_expects = $self->{_expects} ? @{ $self->{_expects} } : 0;
     my $n_returns = $self->{_returns} ? @{ $self->{_returns} } : 0;
 
-    if ( $called ) {
+# called of -1 will be allowed with multiple expects and/or returns. Any other value of called will require that expects or returns
+# has only been defined 0 or 1 time.
+    if ( defined( $called ) && $called >= 0 ) {
 
         # breaking into two if statements so Devel::Cover marks this condition as covered
         if ( $n_expects > 1 || $n_returns > 1 ) {

@@ -122,6 +122,7 @@ subtest 'called' => sub {
         check_tests(
             sub {
                 my $m = Test::MockPackages::Mock->new( 'TMPTestPackage', 'subroutine' )->called( -1 )->expects( 'never' )
+                    ->returns( 'blank' )->expects( 'never' ) # can also use -1 with multiple calls to expects and/or returns.
                     ->returns( 'blank' );
             },
             [],
