@@ -120,6 +120,8 @@ can be simplified as:
 By default, this package will ensure that a mocked subroutine/method is called the same number of times that C<expects()> and/or C<returns()> has been setup for.
 You only need to use this method if you don't setup any expects or returns, or to simplify repeated values like what was shown up above.
 
+C<-1> is a special value which will ensure that have the test ignore the check on how many times a subroutine/method was called.
+
 Return value: Returns itself to support the fluent interface.
 
 =cut
@@ -127,8 +129,8 @@ Return value: Returns itself to support the fluent interface.
 sub called {
     my ( $self, $called ) = @ARG;
 
-    if ( !looks_like_number( $called ) || $called < 0 ) {
-        croak( '$called must be an integer >= 0' );
+    if ( !looks_like_number( $called ) || $called < -1 ) {
+        croak( '$called must be an integer >= -1' );
     }
 
     $self->{_called} = $called;
@@ -381,7 +383,14 @@ sub _expected_invocations {
     my ( $self ) = @ARG;
 
     return 0 if $self->{_never};
-    return $self->{_called} if defined $self->{_called};
+
+    if ( defined( my $called = $self->{_called} ) ) {
+        if ( $called == -1 ) {
+            return;
+        }
+
+        return $called;
+    }
 
     my $n_expects = $self->{_expects} ? @{ $self->{_expects} } : 0;
     my $n_returns = $self->{_returns} ? @{ $self->{_returns} } : 0;

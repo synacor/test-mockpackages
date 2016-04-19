@@ -118,19 +118,30 @@ subtest 'called' => sub {
     $test->( $OK,     2, 2 );
     $test->( $NOT_OK, 2, 1 );
 
+    subtest '-1 allows us to never check' => sub {
+        check_tests(
+            sub {
+                my $m = Test::MockPackages::Mock->new( 'TMPTestPackage', 'subroutine' )->called( -1 )->expects( 'never' )
+                    ->returns( 'blank' );
+            },
+            [],
+            'no tests run'
+        );
+    };
+
     throws_ok(
         sub {
             my $m = Test::MockPackages::Mock->new( 'TMPTestPackage', 'subroutine' )->called( '2a' );
         },
-        qr/\$called must be an integer >= 0/,
+        qr/\$called must be an integer >= -1/,
         'exception raised when called is not an integer'
     );
 
     throws_ok(
         sub {
-            my $m = Test::MockPackages::Mock->new( 'TMPTestPackage', 'subroutine' )->called( -1 );
+            my $m = Test::MockPackages::Mock->new( 'TMPTestPackage', 'subroutine' )->called( -2 );
         },
-        qr/\$called must be an integer >= 0/,
+        qr/\$called must be an integer >= -1/,
         'exception raised when called is not an integer'
     );
 };
