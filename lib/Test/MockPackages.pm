@@ -107,7 +107,7 @@ __END__
 
 =head1 NAME
 
-Test::MockPackages - Mocking framework
+Test::MockPackages - Mock external dependencies in tests
 
 =head1 SYNOPSIS
 
