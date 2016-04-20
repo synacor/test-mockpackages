@@ -60,6 +60,6 @@ Written by Tom Peters <tpeters at synacor.com>.
 
 =head1 COPYRIGHT
 
-Copyright (c), Synacor, Inc., 2016
+Copyright (c) 2016 Synacor, Inc.
 
 =cut
