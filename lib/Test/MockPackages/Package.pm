@@ -3,6 +3,8 @@ use strict;
 use warnings;
 use utf8;
 
+our $VERSION = '0.1';
+
 use Carp qw(croak);
 use English qw(-no_match_vars);
 use Test::MockPackages::Mock();
@@ -41,6 +43,10 @@ __END__
 =head1 NAME
 
 Test::MockPackages::Package - Helper package for mocking subroutines and methods on a given package.
+
+=head1 VERSION
+
+Version 0.1
 
 =head1 SYNOPSIS
 

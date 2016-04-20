@@ -109,6 +109,10 @@ __END__
 
 Test::MockPackages - Mock external dependencies in tests
 
+=head1 VERSION
+
+Version 0.1
+
 =head1 SYNOPSIS
 
  my $m = Test::MockPackages->new();

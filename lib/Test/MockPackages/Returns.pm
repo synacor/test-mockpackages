@@ -3,13 +3,15 @@ use strict;
 use warnings;
 use utf8;
 
+our $VERSION = '0.1';
+
 use English qw(-no_match_vars);
 use Exporter qw(import);
 
 our @EXPORT_OK = qw(returns_code);
 
-sub returns_code(&) { ## no critic (Subroutines::ProhibitSubroutinePrototypes)
-    my ($coderef) = @ARG;
+sub returns_code(&) {    ## no critic (Subroutines::ProhibitSubroutinePrototypes)
+    my ( $coderef ) = @ARG;
 
     return bless $coderef, __PACKAGE__;
 }
@@ -21,6 +23,10 @@ __END__
 =head1 NAME
 
 Test::MockPackages::Returns - provides a helper subroutine for creating custom returns
+
+=head1 VERSION
+
+Version 0.1
 
 =head1 SYNOPSIS
 
