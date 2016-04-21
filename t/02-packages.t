@@ -22,23 +22,23 @@ throws_ok(
 
 throws_ok(
     sub {
-        Test::MockPackages::Package->new([]);
+        Test::MockPackages::Package->new( [] );
     },
     qr/^\$\Qpackage_name is required and must be a SCALAR/x,
     'requires package_name to be a SCALAR'
 );
 
-my $m = Test::MockPackages::Package->new('TMPTestPackage');
+my $m = Test::MockPackages::Package->new( 'TMPTestPackage' );
 isa_ok( $m, 'Test::MockPackages::Package' );
 
-my $mock = $m->mock('subroutine');
+my $mock = $m->mock( 'subroutine' );
 isa_ok( $mock, 'Test::MockPackages::Mock' );
-is( $mock, $m->mock('subroutine'), 'same object returned' );
-isnt( $mock, Test::MockPackages::Package->new('TMPTestPackage')->mock('subroutine'), 'different objects returned' );
+is( $mock, $m->mock( 'subroutine' ), 'same object returned' );
+isnt( $mock, Test::MockPackages::Package->new( 'TMPTestPackage' )->mock( 'subroutine' ), 'different objects returned' );
 
 throws_ok(
     sub {
-        $m->mock()
+        $m->mock();
     },
     qr/^\$\Qname is required and must be a SCALAR/,
     'missing $name'
@@ -46,7 +46,7 @@ throws_ok(
 
 throws_ok(
     sub {
-        $m->mock([])
+        $m->mock( [] );
     },
     qr/^\$\Qname is required and must be a SCALAR/,
     '$name not a SCALAR'
