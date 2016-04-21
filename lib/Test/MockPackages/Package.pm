@@ -36,6 +36,15 @@ sub mock {
     return $self->{_mocks}{$name} = Test::MockPackages::Mock->new( $self->{_package_name}, $name );
 }
 
+sub DESTROY {
+    my ( $self ) = @ARG;
+
+    # ensures that objects are destroyed in a consistent order.
+    for my $key ( sort keys %{ $self->{_mocks} } ) {
+        delete $self->{_mocks}{$key};
+    }
+}
+
 1;
 
 __END__

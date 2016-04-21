@@ -99,6 +99,15 @@ sub _must_validate {
     return 1;
 }
 
+sub DESTROY {
+    my ( $self ) = @ARG;
+
+    # this is to ensure that the objects are destroyed in a consistent order.
+    for my $pkg ( sort keys %{ $self->{_packages} } ) {
+        delete $self->{_packages}{$pkg};
+    }
+}
+
 1;
 
 __END__
