@@ -4,7 +4,7 @@ use warnings;
 use utf8;
 use feature qw(state);
 
-our $VERSION = '0.3';
+our $VERSION = '0.4';
 
 use Carp qw(croak);
 use English qw(-no_match_vars);
@@ -120,7 +120,7 @@ Test::MockPackages - Mock external dependencies in tests
 
 =head1 VERSION
 
-Version 0.3
+Version 0.4
 
 =head1 SYNOPSIS
 
@@ -174,7 +174,7 @@ Version 0.3
 Test::MockPackages is a package for mocking other packages as well as ensuring those packages are being used correctly.
 
 Say we have a Weather class that can return the current degrees in Fahrenheit. In order to do this it uses another class, Weather::Fetcher which
-makes an external call. When we want to write a unit test for Weather, we want to mock the functionality of Weather::Fethcer.
+makes an external call. When we want to write a unit test for Weather, we want to mock the functionality of Weather::Fetcher.
 
 Here is the sample code for our Weather class:
 

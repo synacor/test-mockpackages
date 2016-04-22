@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = '0.3';
+our $VERSION = '0.4';
 
 =head1 NAME
 
@@ -11,7 +11,7 @@ Test::MockPackages::Mock - handles mocking of individual methods and subroutines
 
 =head1 VERSION
 
-Version 0.3
+Version 0.4
 
 =head1 SYNOPSIS
 
@@ -112,7 +112,10 @@ sub new {
 
 Will ensure that the subroutine/method has been called C<$called> times. This method cannot be used in combination with C<never_called()>.
 
+Setting C<$called> to C<-1> will prevent invocation count checks.
+
 You can combined this method with C<expects()> and/or C<returns()> to support repeated values. For example:
+
     $m->expects($arg1, $arg2)
       ->expects($arg1, $arg2)
       ->expects($arg1, $arg2)
@@ -120,13 +123,13 @@ You can combined this method with C<expects()> and/or C<returns()> to support re
       ->expects($arg1, $arg2);
 
 can be simplified as:
+
     $m->expects($arg1, $arg2)
       ->called(5);
 
-By default, this package will ensure that a mocked subroutine/method is called the same number of times that C<expects()> and/or C<returns()> has been setup for.
-You only need to use this method if you don't setup any expects or returns, or to simplify repeated values like what was shown up above.
+By default, this package will ensure that a mocked subroutine/method is called the same number of times that C<expects()> and/or C<returns()> has been setup for. For example, if you call C<expects()> three times, then when this object is destroyed we will ensure the mocked subroutine/method was called exactly three times, no more, no less.
 
-C<-1> is a special value which will ensure that have the test ignore the check on how many times a subroutine/method was called.
+Therefore, you only need to use this method if you don't setup any expects or returns, or to simplify repeated values like what was shown up above.
 
 Return value: Returns itself to support the fluent interface.
 
@@ -179,7 +182,7 @@ sub is_method {
 =head2 expects( Any @expects ) : Test::MockPackage::Mock, Throws '...'
 
 Ensures that each invocation has the correct arguments passed in. If the subroutine/method will be called multiple times, you can call C<expects()> multiple times. If
-the same expectation will be used repeatedly, you can use this in conjunction with C<called()>. See L<called()> for more information.
+the same arguments are expected repeatedly, you can use this in conjunction with C<called()>. See L<called()> for further information.
 
 If you are mocking a method, be sure to call C<is_method()> at some point.
 
@@ -271,7 +274,7 @@ sub _initialize {
         # $i is the current invocation
         my $i = $invoke_number - 1;
 
-        # the first value passed into the method is the object itself. ignore that.
+        # The first value passed into the method is the object itself. Ignore that.
         if ( $self->{_is_method} ) {
             shift @got;
         }

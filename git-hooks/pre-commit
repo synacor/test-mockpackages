@@ -1,0 +1,24 @@
+#!/bin/bash
+
+# pre-commit
+#
+# This script will ensure that all Perl related files which are staged for a commit have been perltidy'd.
+# If any files are found to have not been tied, the commit will abort. If for some reason you are certain the
+# file has been tidied appropriately, you can add the --no-verify option to ignore the pre-commit check.
+
+HAS_ERROR=0
+for i in $(git diff --cached --name-only --diff-filter=ACMRTUX | grep -iP '\.(?:pl|pm|t)$'); do
+    if ! diff <( git show :$i ) <( git show :$i | perltidy -nb -st $i ) >/dev/null 2>&1; then
+        echo "$i is not tidy"
+        HAS_ERROR=1
+    fi
+done
+
+if [ $HAS_ERROR -eq 1 ]; then
+    echo ""
+    echo "You have perltidy errors. Please perltidy the file(s), stage them, and try your commit again."
+    echo "If you feel this message is in error, please use --no-verify to skip this pre-commit check."
+    exit 1
+fi
+
+exit 0
