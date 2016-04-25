@@ -12,9 +12,11 @@ WriteMakefile(
         : () ),
     PL_FILES  => {},
     PREREQ_PM => {
-        'Test::More'          => 0,
         'Const::Fast'         => 0,
         'Lingua::EN::Inflect' => 0,
+        'Test::Exception'     => 0,
+        'Test::More'          => 0,
+        'Test::Tester'        => 0,
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES    => 'Test-MockPackages-*' },
