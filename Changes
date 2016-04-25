@@ -1,7 +1,8 @@
 Revision history for Test-MockPackages
 
-0.4    2016-04-22
+0.4    2016-04-25
        Documentation changes
+       Added more dependencies to Makefile.PL
 
 0.3    2016-04-20
        Packaging changes
