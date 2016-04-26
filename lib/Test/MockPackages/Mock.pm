@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = '0.4';
+our $VERSION = '0.5';
 
 =head1 NAME
 
@@ -11,7 +11,7 @@ Test::MockPackages::Mock - handles mocking of individual methods and subroutines
 
 =head1 VERSION
 
-Version 0.4
+Version 0.5
 
 =head1 SYNOPSIS
 

@@ -72,7 +72,7 @@ subtest 'never' => sub {
             },
             {   ok    => 1,
                 name  => "TMPTestPackage::subroutine called 0 times",
-                depth => -4,
+                depth => undef,
             },
             'never_called()'
         );
@@ -88,7 +88,7 @@ subtest 'never' => sub {
             },
             {   ok    => 0,
                 name  => "TMPTestPackage::subroutine called 0 times",
-                depth => -4,
+                depth => undef,
             },
             'never_called()'
         );
@@ -107,7 +107,7 @@ subtest 'called' => sub {
             },
             {   ok    => $ok,
                 name  => sprintf( 'TMPTestPackage::subroutine called %d %s', $called, PL( 'time', $called ) ),
-                depth => -4,
+                depth => undef,
             },
             sprintf( '%s %s', NUMWORDS( $called ), PL( 'time', $called ) )
         );
@@ -163,7 +163,7 @@ subtest 'expects' => sub {
                 },
                 {   ok    => 1,
                     name  => 'TMPTestPackage::method called 1 time',
-                    depth => -4,
+                    depth => undef,
                 }
             ],
             'expects succeds'
@@ -183,7 +183,7 @@ subtest 'expects' => sub {
                 },
                 {   ok    => 1,
                     name  => 'TMPTestPackage::method called 1 time',
-                    depth => -4,
+                    depth => undef,
                 }
             ],
             'expects fails'
@@ -204,7 +204,7 @@ subtest 'expects' => sub {
                 },
                 {   ok    => 1,
                     name  => 'TMPTestPackage::subroutine called 1 time',
-                    depth => -4,
+                    depth => undef,
                 }
             ],
             'expects succeeds'
@@ -223,7 +223,7 @@ subtest 'expects' => sub {
                 },
                 {   ok    => 1,
                     name  => 'TMPTestPackage::subroutine called 1 time',
-                    depth => -4,
+                    depth => undef,
                 }
             ],
             'expects fails'
@@ -255,7 +255,7 @@ subtest 'expects' => sub {
                 },
                 {   ok    => 1,
                     name  => 'TMPTestPackage::subroutine called 3 times',
-                    depth => -4,
+                    depth => undef,
                 },
             ],
             'all succeed'
@@ -285,7 +285,7 @@ subtest 'expects' => sub {
                 },
                 {   ok    => 1,
                     name  => 'TMPTestPackage::subroutine called 3 times',
-                    depth => -4,
+                    depth => undef,
                 },
             ],
             'one fails'
@@ -312,7 +312,7 @@ subtest 'expects' => sub {
                 },
                 {   ok    => 0,
                     name  => 'TMPTestPackage::subroutine called 3 times',
-                    depth => -4,
+                    depth => undef,
                 }
             ],
             'too few invokes'
@@ -337,7 +337,7 @@ subtest 'expects' => sub {
                 },
                 {   ok    => 1,
                     name  => 'TMPTestPackage::subroutine called 2 times',
-                    depth => -4,
+                    depth => undef,
                 }
             ],
             'expects ok'
@@ -362,7 +362,7 @@ subtest 'expects' => sub {
                 },
                 {   ok    => 1,
                     name  => 'TMPTestPackage::subroutine called 2 times',
-                    depth => -4,
+                    depth => undef,
                 }
             ],
             'expects ok'
@@ -387,7 +387,7 @@ subtest 'expects' => sub {
                 },
                 {   ok    => 0,
                     name  => 'TMPTestPackage::subroutine called 1 time',
-                    depth => -4,
+                    depth => undef,
                 }
             ],
             'testing too many calls'
@@ -414,7 +414,7 @@ subtest 'returns' => sub {
             },
             {   ok    => 1,
                 name  => 'TMPTestPackage::subroutine called 1 time',
-                depth => -4,
+                depth => undef,
             }
         );
 
@@ -434,7 +434,7 @@ subtest 'returns' => sub {
             },
             {   ok    => 1,
                 name  => 'TMPTestPackage::subroutine called 3 times',
-                depth => -4,
+                depth => undef,
             }
         );
 
@@ -452,7 +452,7 @@ subtest 'returns' => sub {
             },
             {   ok    => 1,
                 name  => 'TMPTestPackage::subroutine called 2 times',
-                depth => -4,
+                depth => undef,
             },
             'validate called'
         );
@@ -468,7 +468,7 @@ subtest 'returns' => sub {
                 },
                 {   ok    => 0,
                     name  => 'TMPTestPackage::subroutine called 1 time',
-                    depth => -6,
+                    depth => undef,
                 },
                 'validate called'
             );
@@ -483,7 +483,7 @@ subtest 'returns' => sub {
                 },
                 {   ok    => 0,
                     name  => 'TMPTestPackage::subroutine called 2 times',
-                    depth => -4,
+                    depth => undef,
                 },
                 'validate called'
             );
@@ -504,7 +504,7 @@ subtest 'returns' => sub {
                 },
                 {   ok    => 0,
                     name  => 'TMPTestPackage::subroutine called 1 time',
-                    depth => -4,
+                    depth => undef,
                 },
                 'validate called'
             );
@@ -531,7 +531,7 @@ subtest 'returns' => sub {
                 },
                 {   ok    => 0,
                     name  => 'TMPTestPackage::subroutine called 2 times',
-                    depth => -4,
+                    depth => undef,
                 },
                 'validate called'
             );

@@ -4,7 +4,7 @@ use warnings;
 use utf8;
 use feature qw(state);
 
-our $VERSION = '0.4';
+our $VERSION = '0.5';
 
 use Carp qw(croak);
 use English qw(-no_match_vars);
@@ -120,7 +120,7 @@ Test::MockPackages - Mock external dependencies in tests
 
 =head1 VERSION
 
-Version 0.4
+Version 0.5
 
 =head1 SYNOPSIS
 
