@@ -209,7 +209,15 @@ If this method will always return the same values, you can call C<returns()> onc
 When the C<Test::MockPackages::Mock> object goes out of scope, we'll test to make sure that the subroutine/method was called the correct number of times based on the number
 of times that C<expects()> was called, unless C<called()> is specified.
 
-Values passed in will be returned verbatim. A deep clone is also performed to accidental side effects aren't tested.
+Values passed in will be returned verbatim. A deep clone is also performed to accidental side effects aren't tested. If you don't want to have your data deep cloned, you can use returns_code.
+
+ $m->mock('my_sub')
+   ->returns( $data_structure ); # $data_structure will be deep cloned using Storable::dclone();
+
+ $m->mock('my_sub')
+   ->returns( returns_code { $data_structure } ); # $data_structure will not be cloned.
+
+If you plan on returning a L<Test::MockObject> object, you will want to ensure that it's not deep cloned (using returns_code) because that module uses the object's address to keep track of mocked methods (instead of using attributes).
 
 C<wantarray> will be used to try and determine if a list or a single value should be returned. If C<@returns> contains a single element and C<wantarray> is false, the value at index 0 will be returned. Otherwise,
 a list will be returned.
