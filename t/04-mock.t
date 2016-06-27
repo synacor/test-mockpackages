@@ -3,15 +3,18 @@ use strict;
 use warnings;
 use 5.012;
 
+# must be loaded first.
+use Test::Tester;
+
 use Const::Fast qw(const);
 use English qw(-no_match_vars);
+use FindBin qw($RealBin);
 use Lingua::EN::Inflect qw(NUMWORDS PL);
-use Test::Tester;
+use Test::Deep qw(re);
 use Test::Exception;
-use Test::More;
 use Test::MockPackages::Mock();
 use Test::MockPackages::Returns qw(returns_code);
-use FindBin qw($RealBin);
+use Test::More;
 use lib "$RealBin/lib";
 use TMPTestPackage();
 
@@ -394,6 +397,26 @@ subtest 'expects' => sub {
         );
 
         like( $error, qr/\QTMPTestPackage::subroutine was called 2 times. Only 1 expectation defined/, 'correct exception' );
+    };
+
+    subtest 'expects with regex' => sub {
+        check_tests(
+            sub {
+                my $m2 = Test::MockPackages::Mock->new( 'TMPTestPackage', 'subroutine' )->expects( re qr/match/ );
+
+                TMPTestPackage::subroutine( 'find a match in here' );
+            },
+            [   {   ok    => 1,
+                    name  => 'TMPTestPackage::subroutine expects is correct',
+                    depth => 1,
+                },
+                {   ok    => 1,
+                    name  => 'TMPTestPackage::subroutine called 1 time',
+                    depth => undef,
+                }
+            ],
+            'expects ok'
+        );
     };
 };
 
