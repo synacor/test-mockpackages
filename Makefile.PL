@@ -14,6 +14,7 @@ WriteMakefile(
     PREREQ_PM => {
         'Const::Fast'         => 0,
         'Lingua::EN::Inflect' => 0,
+        'Test::Deep'          => 0,
         'Test::Exception'     => 0,
         'Test::More'          => 0,
         'Test::Tester'        => 0,
