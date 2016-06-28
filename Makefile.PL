@@ -17,6 +17,8 @@ WriteMakefile(
         'Test::Deep'          => 0,
         'Test::Exception'     => 0,
         'Test::More'          => 0,
+        'Test::Pod'           => '1.22',
+        'Test::Pod::Coverage' => '1.08',
         'Test::Tester'        => 0,
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },

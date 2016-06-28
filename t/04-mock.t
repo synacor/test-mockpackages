@@ -1,7 +1,6 @@
 #!/usr/bin/env perl
 use strict;
 use warnings;
-use 5.012;
 
 # must be loaded first.
 use Test::Tester;

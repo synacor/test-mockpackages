@@ -1,5 +1,8 @@
 Revision history for Test-MockPackages
 
+0.7    2016-06-28
+       Allow Test::MockPackages to work on Perl 5.8
+
 0.6    2016-06-24
        Use Test::Deep::cmp_deeply for expects() instead of Test::More::is_deeply().
 

@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = '0.6';
+our $VERSION = '0.7';
 
 use Carp qw(croak);
 use English qw(-no_match_vars);
@@ -55,7 +55,7 @@ Test::MockPackages::Package - Helper package for mocking subroutines and methods
 
 =head1 VERSION
 
-Version 0.6
+Version 0.7
 
 =head1 SYNOPSIS
 
