@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = '0.5';
+our $VERSION = '0.6';
 
 =head1 NAME
 
@@ -11,7 +11,7 @@ Test::MockPackages::Mock - handles mocking of individual methods and subroutines
 
 =head1 VERSION
 
-Version 0.5
+Version 0.6
 
 =head1 SYNOPSIS
 
@@ -65,6 +65,7 @@ use Lingua::EN::Inflect qw(PL);
 use List::Util qw(max);
 use Scalar::Util qw(looks_like_number weaken);
 use Storable qw(dclone);
+use Test::Deep qw(cmp_deeply);
 use Test::More;
 use parent qw(Test::Builder::Module);
 
@@ -189,6 +190,13 @@ If you are mocking a method, be sure to call C<is_method()> at some point.
 When the C<Test::MockPackages::Mock> object goes out of scope, we'll test to make sure that the subroutine/method was called the correct number of times based on the number
 of times that C<expects()> was called, unless C<called()> is specified.
 
+The actual comparison is done using Test::Deep::cmp_deeply(), so you can use any of the associated helper methods to do a comparison.
+
+  use Test::Deep qw(re);
+
+  $m->mock( 'my_sub' )
+    ->expects( re( qr/^\d{5}\z/ ) );
+
 Return value: Returns itself to support the fluent interface.
 
 =cut
@@ -308,7 +316,7 @@ sub _initialize {
             }
 
             local $Test::Builder::Level = $Test::Builder::Level + 1;    ## no critic (Variables::ProhibitPackageVars)
-            is_deeply( \@got, $expected, "$self->{_full_name} expects is correct" );
+            cmp_deeply( \@got, $expected, "$self->{_full_name} expects is correct" );
         }
 
         # setup the return values
