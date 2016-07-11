@@ -619,6 +619,13 @@ subtest 'returns' => sub {
             is( $value, 'one', 'value returned' );
         };
     };
+
+    subtest 'localized $EVAL_ERROR' => sub {
+        my $m = Test::MockPackages::Mock->new( 'TMPTestPackage', 'subroutine' )->returns( 5 );
+        eval { die "some error\n" };
+        is( TMPTestPackage::subroutine(), 5, 'correct value' );
+        is( $EVAL_ERROR, "some error\n", 'correct $EVAL_ERROR' );
+    };
 };
 
 subtest '_validate' => sub {

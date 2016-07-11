@@ -1,5 +1,9 @@
 Revision history for Test-MockPackages
 
+0.8    2016-07-11
+       Localize $EVAL_ERROR
+       Require Perl >= 5.8.5
+
 0.7    2016-06-28
        Allow Test::MockPackages to work on Perl 5.8
 
