@@ -2,9 +2,9 @@ package Test::MockPackages;
 use strict;
 use warnings;
 use utf8;
-use 5.0085;
+use 5.010;
 
-our $VERSION = '0.8';
+our $VERSION = '0.9';
 
 use Carp qw(croak);
 use English qw(-no_match_vars);
@@ -89,8 +89,12 @@ sub _must_validate {
                     croak( "arguments must be an ARRAY for mock method $mock_method in ${pkg}::$sub" );
                 }
 
-                local $EVAL_ERROR = undef;
-                if ( !eval { Test::MockPackages::Mock->can( $mock_method ) } ) {
+                if (!do {
+                        local $EVAL_ERROR = undef;
+                        eval { Test::MockPackages::Mock->can( $mock_method ) };
+                    }
+                    )
+                {
                     croak( "$mock_method is not a capability of Test::MockPackages::Mock in ${pkg}::$sub" );
                 }
             }
@@ -123,7 +127,7 @@ Test::MockPackages - Mock external dependencies in tests
 
 =head1 VERSION
 
-Version 0.8
+Version 0.9
 
 =head1 SYNOPSIS
 

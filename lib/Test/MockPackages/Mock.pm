@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = '0.8';
+our $VERSION = '0.9';
 
 =head1 NAME
 
@@ -11,7 +11,7 @@ Test::MockPackages::Mock - handles mocking of individual methods and subroutines
 
 =head1 VERSION
 
-Version 0.8
+Version 0.9
 
 =head1 SYNOPSIS
 
@@ -248,10 +248,13 @@ Return value: Returns itself to support the fluent interface.
 sub returns {
     my ( $self, @returns ) = @ARG;
 
-    local $EVAL_ERROR = undef;
-
     # dclone will remove the bless on the CodeRef.
-    if ( @returns == 1 && eval { $returns[ 0 ]->isa( 'Test::MockPackages::Returns' ) } ) {
+    if (@returns == 1 && do {
+            local $EVAL_ERROR = undef;
+            eval { $returns[ 0 ]->isa( 'Test::MockPackages::Returns' ) };
+        }
+        )
+    {
         push @{ $self->{_returns} }, \@returns;
     }
     else {
@@ -346,8 +349,12 @@ sub _initialize {
             return;
         }
 
-        local $EVAL_ERROR = undef;
-        if ( @returns == 1 && eval { $returns[ 0 ]->isa( 'Test::MockPackages::Returns' ) } ) {
+        if (@returns == 1 && do {
+                local $EVAL_ERROR = undef;
+                eval { $returns[ 0 ]->isa( 'Test::MockPackages::Returns' ) };
+            }
+            )
+        {
             return $returns[ 0 ]->( @got );
         }
 

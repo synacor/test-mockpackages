@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = '0.8';
+our $VERSION = '0.9';
 
 use English qw(-no_match_vars);
 use Exporter qw(import);
@@ -26,7 +26,7 @@ Test::MockPackages::Returns - provides a helper subroutine for creating custom r
 
 =head1 VERSION
 
-Version 0.8
+Version 0.9
 
 =head1 SYNOPSIS
 
