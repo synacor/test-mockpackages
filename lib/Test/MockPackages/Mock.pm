@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = '0.9';
+our $VERSION = '0.10';
 
 =head1 NAME
 
@@ -11,7 +11,7 @@ Test::MockPackages::Mock - handles mocking of individual methods and subroutines
 
 =head1 VERSION
 
-Version 0.9
+Version 0.10
 
 =head1 SYNOPSIS
 
@@ -289,6 +289,9 @@ sub _initialize {
     my $mock = sub {
         my ( @got ) = @ARG;
 
+        # used for returns_code
+        my @original_args = @got;
+
         # _invoke_count keeps track of how many times this subroutine/method was called
         my $invoke_number = ++$self->{_invoke_count};
 
@@ -355,7 +358,7 @@ sub _initialize {
             }
             )
         {
-            return $returns[ 0 ]->( @got );
+            return $returns[ 0 ]->( @original_args );
         }
 
         # return the first element if only one return defined and a wantarray is false.

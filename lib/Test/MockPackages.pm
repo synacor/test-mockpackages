@@ -4,7 +4,7 @@ use warnings;
 use utf8;
 use 5.010;
 
-our $VERSION = '0.9';
+our $VERSION = '0.10';
 
 use Carp qw(croak);
 use English qw(-no_match_vars);
@@ -127,7 +127,7 @@ Test::MockPackages - Mock external dependencies in tests
 
 =head1 VERSION
 
-Version 0.9
+Version 0.10
 
 =head1 SYNOPSIS
 

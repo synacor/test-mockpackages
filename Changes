@@ -1,5 +1,8 @@
 Revision history for Test-MockPackages
 
+0.10   2016-11-30
+       coderef passed to returns_code will now receive $self argument.
+
 0.9    2016-07-12
        Fix issues with eval in Perl 5.10
 

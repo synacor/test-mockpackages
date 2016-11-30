@@ -595,6 +595,13 @@ subtest 'returns' => sub {
             my $retval = TMPTestPackage::subroutine( 10 );
             is( $retval, 15, 'coderef properly executed' );
         };
+
+        subtest 'custom coderef with method' => sub {
+            my $m = Test::MockPackages::Mock->new( 'TMPTestPackage', 'method' )->is_method()
+                ->returns( returns_code { return join '|', @ARG } );
+            my $retval = TMPTestPackage->method( 10, 20 );
+            is( $retval, 'TMPTestPackage|10|20', 'coderef properly executed' );
+        };
     };
 
     subtest 'wantarray' => sub {
