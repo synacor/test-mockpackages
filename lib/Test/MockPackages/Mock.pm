@@ -67,6 +67,7 @@ use Scalar::Util qw(looks_like_number weaken);
 use Storable qw(dclone);
 use Test::Deep qw(cmp_deeply);
 use Test::More;
+use Sub::Metadata qw(mutate_sub_prototype sub_prototype);
 use parent qw(Test::Builder::Module);
 
 my $CLASS = __PACKAGE__;
@@ -368,6 +369,11 @@ sub _initialize {
     do {
         no strict qw(refs);          ## no critic (TestingAndDebugging::ProhibitNoStrict)
         no warnings qw(redefine);    ## no critic (TestingAndDebugging::ProhibitNoWarnings)
+
+        if( defined( my $prototype = sub_prototype \&{$self->{_full_name}} ) ) {
+            mutate_sub_prototype $mock, $prototype;
+        }
+
         my $full_name = $self->{_full_name};
         *$full_name = $mock;
     };
