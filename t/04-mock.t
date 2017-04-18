@@ -9,6 +9,7 @@ use Const::Fast qw(const);
 use English qw(-no_match_vars);
 use FindBin qw($RealBin);
 use Lingua::EN::Inflect qw(NUMWORDS PL);
+use Sub::Metadata qw(sub_prototype);
 use Test::Deep qw(re);
 use Test::Exception;
 use Test::MockPackages::Mock();
@@ -679,6 +680,36 @@ subtest '_validate' => sub {
         qr/\Qnever_called() cannot be used if called(), expects(), or returns() have been defined/,
         'exception when never_called() used with called()'
     );
+};
+
+subtest '_initialize' => sub {
+
+    subtest 'empty prototype' => sub {
+        is( sub_prototype( TMPTestPackage->can( 'empty_prototype' ) ), q(), 'correct un-mocked prototype' );
+
+        my $m = Test::MockPackages::Mock->new( 'TMPTestPackage', 'empty_prototype' );
+        $m->returns( 'mocked empty_prototype' )->expects();
+        is( sub_prototype( TMPTestPackage->can( 'empty_prototype' ) ), q(), 'correct mocked prototype' );
+        is( TMPTestPackage::empty_prototype(), 'mocked empty_prototype', 'correct return' );
+
+        undef $m;
+        is( sub_prototype( TMPTestPackage->can( 'empty_prototype' ) ), q(), 'correct un-mocked prototype' );
+        is( TMPTestPackage::empty_prototype, 'empty_prototype', 'correct un-mocked return' );
+    };
+
+    subtest 'scalar prototype' => sub {
+        is( sub_prototype( TMPTestPackage->can( 'scalar_prototype' ) ), q($), 'correct un-mocked prototype' );
+
+        my $m = Test::MockPackages::Mock->new( 'TMPTestPackage', 'scalar_prototype' );
+        $m->returns( 'mocked scalar_prototype foo' )->expects( 'foo' );
+        is( sub_prototype( TMPTestPackage->can( 'scalar_prototype' ) ), q($), 'correct mocked prototype' );
+        is( TMPTestPackage::scalar_prototype( 'foo' ), 'mocked scalar_prototype foo', 'correct return' );
+
+        undef $m;
+        is( sub_prototype( TMPTestPackage->can( 'scalar_prototype' ) ), q($), 'correct un-mocked prototype' );
+        is( TMPTestPackage::scalar_prototype( 'bar' ), 'scalar_prototype bar', 'correct un-mocked return' );
+    };
+
 };
 
 done_testing();
